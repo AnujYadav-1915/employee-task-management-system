@@ -46,7 +46,7 @@ public class AuthResponse {
         return role;
     }
 
-    public void setRole(Role role) {
+    public void setRole(String role) {
         this.role = role;
     }
 
