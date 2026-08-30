@@ -1,5 +1,5 @@
 services:
-  # React Frontend Static Site (FREE $0/mo)
+  # React Frontend Static Site
   - type: web
     name: taskflow-frontend
     env: static
@@ -7,9 +7,9 @@ services:
     staticPublishPath: ./frontend/dist
     envVars:
       - key: VITE_API_BASE_URL
-        value: https://taskflow-backend.onrender.com/api
+        value: https://taskflow-backend-y1c0.onrender.com/api
 
-  # Unified Spring Boot Java Backend Service (FREE $0/mo)
+  # Unified Spring Boot Java Backend Service
   - type: web
     name: taskflow-backend
     env: docker
