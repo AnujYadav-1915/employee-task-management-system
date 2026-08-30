@@ -1,5 +1,5 @@
 services:
-  # React Frontend Static Site (FREE)
+  # React Frontend Static Site (FREE $0/mo)
   - type: web
     name: taskflow-frontend
     env: static
@@ -7,48 +7,11 @@ services:
     staticPublishPath: ./frontend/dist
     envVars:
       - key: VITE_API_BASE_URL
-        value: https://taskflow-gateway.onrender.com/api
+        value: https://taskflow-backend.onrender.com/api
 
-  # Spring Cloud API Gateway (FREE)
+  # Unified Spring Boot Java Backend Service (FREE $0/mo)
   - type: web
-    name: taskflow-gateway
+    name: taskflow-backend
     env: docker
     plan: free
-    dockerfilePath: ./api-gateway/Dockerfile
-    envVars:
-      - key: AUTH_SERVICE_URL
-        value: http://taskflow-auth:8081
-      - key: USER_SERVICE_URL
-        value: http://taskflow-user:8082
-      - key: TASK_SERVICE_URL
-        value: http://taskflow-task:8083
-      - key: NOTIFICATION_SERVICE_URL
-        value: http://taskflow-notification:8084
-
-  # Auth Service (FREE)
-  - type: web
-    name: taskflow-auth
-    env: docker
-    plan: free
-    dockerfilePath: ./auth-service/Dockerfile
-
-  # User Service (FREE)
-  - type: web
-    name: taskflow-user
-    env: docker
-    plan: free
-    dockerfilePath: ./auth-service/Dockerfile
-
-  # Task Service (FREE)
-  - type: web
-    name: taskflow-task
-    env: docker
-    plan: free
-    dockerfilePath: ./task-service/Dockerfile
-
-  # Notification Service (FREE)
-  - type: web
-    name: taskflow-notification
-    env: docker
-    plan: free
-    dockerfilePath: ./notification-service/Dockerfile
+    dockerfilePath: ./taskflow-backend/Dockerfile
