@@ -8,6 +8,10 @@ services:
     envVars:
       - key: VITE_API_BASE_URL
         value: https://taskflow-backend-y1c0.onrender.com/api
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
 
   # Unified Spring Boot Java Backend Service
   - type: web
