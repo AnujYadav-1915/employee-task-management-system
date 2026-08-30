@@ -7,10 +7,7 @@ services:
     staticPublishPath: ./frontend/dist
     envVars:
       - key: VITE_API_BASE_URL
-        fromService:
-          type: web
-          name: taskflow-gateway
-          property: url
+        value: https://taskflow-gateway.onrender.com/api
 
   # Spring Cloud API Gateway
   - type: web
@@ -19,25 +16,13 @@ services:
     dockerfilePath: ./api-gateway/Dockerfile
     envVars:
       - key: AUTH_SERVICE_URL
-        fromService:
-          type: web
-          name: taskflow-auth
-          property: url
+        value: http://taskflow-auth:8081
       - key: USER_SERVICE_URL
-        fromService:
-          type: web
-          name: taskflow-user
-          property: url
+        value: http://taskflow-user:8082
       - key: TASK_SERVICE_URL
-        fromService:
-          type: web
-          name: taskflow-task
-          property: url
+        value: http://taskflow-task:8083
       - key: NOTIFICATION_SERVICE_URL
-        fromService:
-          type: web
-          name: taskflow-notification
-          property: url
+        value: http://taskflow-notification:8084
 
   # Auth Service
   - type: web
