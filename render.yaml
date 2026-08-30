@@ -1,0 +1,64 @@
+services:
+  # React Frontend Static Site
+  - type: web
+    name: taskflow-frontend
+    env: static
+    buildCommand: cd frontend && npm install && npm run build
+    staticPublishPath: ./frontend/dist
+    envVars:
+      - key: VITE_API_BASE_URL
+        fromService:
+          type: web
+          name: taskflow-gateway
+          property: url
+
+  # Spring Cloud API Gateway
+  - type: web
+    name: taskflow-gateway
+    env: docker
+    dockerfilePath: ./api-gateway/Dockerfile
+    envVars:
+      - key: AUTH_SERVICE_URL
+        fromService:
+          type: web
+          name: taskflow-auth
+          property: url
+      - key: USER_SERVICE_URL
+        fromService:
+          type: web
+          name: taskflow-user
+          property: url
+      - key: TASK_SERVICE_URL
+        fromService:
+          type: web
+          name: taskflow-task
+          property: url
+      - key: NOTIFICATION_SERVICE_URL
+        fromService:
+          type: web
+          name: taskflow-notification
+          property: url
+
+  # Auth Service
+  - type: web
+    name: taskflow-auth
+    env: docker
+    dockerfilePath: ./auth-service/Dockerfile
+
+  # User Service
+  - type: web
+    name: taskflow-user
+    env: docker
+    dockerfilePath: ./user-service/Dockerfile
+
+  # Task Service
+  - type: web
+    name: taskflow-task
+    env: docker
+    dockerfilePath: ./task-service/Dockerfile
+
+  # Notification Service
+  - type: web
+    name: taskflow-notification
+    env: docker
+    dockerfilePath: ./notification-service/Dockerfile
