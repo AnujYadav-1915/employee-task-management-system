@@ -1,7 +1,13 @@
 package com.taskflow.config;
 
 import com.taskflow.model.*;
+import com.taskflow.model.admin.AdminUser;
+import com.taskflow.model.employee.EmployeeUser;
+import com.taskflow.model.manager.ManagerUser;
 import com.taskflow.repository.*;
+import com.taskflow.repository.admin.AdminUserRepository;
+import com.taskflow.repository.employee.EmployeeUserRepository;
+import com.taskflow.repository.manager.ManagerUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -14,7 +20,13 @@ import java.util.List;
 public class DataInitializer implements CommandLineRunner {
 
     @Autowired
-    private UserRepository userRepository;
+    private AdminUserRepository adminUserRepository;
+
+    @Autowired
+    private ManagerUserRepository managerUserRepository;
+
+    @Autowired
+    private EmployeeUserRepository employeeUserRepository;
 
     @Autowired
     private EmployeeRepository employeeRepository;
@@ -33,10 +45,13 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        if (userRepository.count() == 0) {
-            seedUserData();
+        if (adminUserRepository.count() == 0) {
+            seedAdminData();
         }
-        if (employeeRepository.count() == 0) {
+        if (managerUserRepository.count() == 0) {
+            seedManagerData();
+        }
+        if (employeeUserRepository.count() == 0 || employeeRepository.count() == 0) {
             seedEmployeeData();
         }
         if (taskRepository.count() == 0) {
@@ -44,24 +59,26 @@ public class DataInitializer implements CommandLineRunner {
         }
     }
 
-    private void seedUserData() {
-        // Manager Anuj Account
-        User manager = new User(
+    private void seedAdminData() {
+        // Exclusive Administrator Account for Anuj in admin_db
+        AdminUser adminAnuj = new AdminUser(
                 "Anuj",
                 "anujyadav11112003@gmail.com",
                 passwordEncoder.encode("Anuj"),
-                Role.ROLE_MANAGER
-        );
-        userRepository.save(manager);
-
-        // Admin Account
-        User admin = new User(
-                "admin",
-                "admin@taskflow.com",
-                passwordEncoder.encode("admin123"),
                 Role.ROLE_ADMIN
         );
-        userRepository.save(admin);
+        adminUserRepository.save(adminAnuj);
+    }
+
+    private void seedManagerData() {
+        // Manager accounts seeded in manager_db
+        ManagerUser manager1 = new ManagerUser(
+                "ManagerOne",
+                "manager1@taskflow.com",
+                passwordEncoder.encode("manager123"),
+                Role.ROLE_MANAGER
+        );
+        managerUserRepository.save(manager1);
     }
 
     private void seedEmployeeData() {
@@ -78,6 +95,19 @@ public class DataInitializer implements CommandLineRunner {
                 new Employee("Olivia Thomas", "olivia.t@taskflow.com", "Scrum Master", "Product", "Available", "+1-555-0110")
         );
         employeeRepository.saveAll(employees);
+
+        for (Employee emp : employees) {
+            String username = emp.getName().toLowerCase().replace(" ", ".");
+            if (!employeeUserRepository.existsByUsername(username)) {
+                EmployeeUser empUser = new EmployeeUser(
+                        username,
+                        emp.getEmail(),
+                        passwordEncoder.encode("password123"),
+                        Role.ROLE_EMPLOYEE
+                );
+                employeeUserRepository.save(empUser);
+            }
+        }
     }
 
     private void seedTaskData() {

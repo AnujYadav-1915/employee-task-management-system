@@ -8,17 +8,41 @@ const Register = () => {
   const [password, setPassword] = useState('');
   const [role, setRole] = useState('ROLE_EMPLOYEE');
   const [error, setError] = useState('');
+  const [showAdminModal, setShowAdminModal] = useState(false);
   const { register } = useContext(AuthContext);
   const navigate = useNavigate();
+
+  const handleRoleChange = (e) => {
+    const selectedRole = e.target.value;
+    if (selectedRole === 'ROLE_ADMIN') {
+      setShowAdminModal(true);
+      setRole('ROLE_EMPLOYEE');
+    } else {
+      setRole(selectedRole);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+
+    if (role === 'ROLE_ADMIN') {
+      setShowAdminModal(true);
+      setRole('ROLE_EMPLOYEE');
+      return;
+    }
+
     try {
       await register(username, email, password, role);
       navigate('/dashboard');
     } catch (err) {
-      setError(err.response?.data?.message || 'Registration failed.');
+      const msg = err.response?.data?.message || 'Registration failed.';
+      if (msg.toLowerCase().includes('administrator')) {
+        setShowAdminModal(true);
+        setRole('ROLE_EMPLOYEE');
+      } else {
+        setError(msg);
+      }
     }
   };
 
@@ -72,7 +96,7 @@ const Register = () => {
 
           <div className="form-group">
             <label>Account Role</label>
-            <select className="form-control" value={role} onChange={(e) => setRole(e.target.value)}>
+            <select className="form-control" value={role} onChange={handleRoleChange}>
               <option value="ROLE_EMPLOYEE">Employee</option>
               <option value="ROLE_MANAGER">Manager</option>
               <option value="ROLE_ADMIN">Administrator</option>
@@ -88,6 +112,25 @@ const Register = () => {
           Already have an account? <Link to="/login" style={{ color: '#2563eb', fontWeight: '500' }}>Sign in</Link>
         </p>
       </div>
+
+      {/* Administrator Block Notification Modal */}
+      {showAdminModal && (
+        <div style={styles.modalOverlay}>
+          <div style={styles.modalContent}>
+            <div style={styles.modalIcon}>⚠️</div>
+            <h3 style={styles.modalTitle}>Administrator Registration Blocked</h3>
+            <p style={styles.modalBody}>
+              You cannot log in or register as an administrator. You can log in or register only as a <strong>Manager</strong> or <strong>Employee</strong>.
+            </p>
+            <button 
+              style={styles.modalButton} 
+              onClick={() => setShowAdminModal(false)}
+            >
+              Understood
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
@@ -98,7 +141,8 @@ const styles = {
     alignItems: 'center',
     justifyContent: 'center',
     minHeight: '100vh',
-    backgroundColor: '#f1f5f9'
+    backgroundColor: '#f1f5f9',
+    position: 'relative'
   },
   card: {
     background: '#ffffff',
@@ -148,6 +192,53 @@ const styles = {
     fontSize: '14px',
     color: '#64748b',
     marginTop: '20px'
+  },
+  modalOverlay: {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(15, 23, 42, 0.65)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 1000
+  },
+  modalContent: {
+    backgroundColor: '#ffffff',
+    padding: '28px',
+    borderRadius: '12px',
+    maxWidth: '420px',
+    width: '90%',
+    textAlign: 'center',
+    boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.2)'
+  },
+  modalIcon: {
+    fontSize: '40px',
+    marginBottom: '12px'
+  },
+  modalTitle: {
+    fontSize: '18px',
+    fontWeight: '700',
+    color: '#0f172a',
+    marginBottom: '12px'
+  },
+  modalBody: {
+    fontSize: '14px',
+    color: '#475569',
+    lineHeight: '1.5',
+    marginBottom: '20px'
+  },
+  modalButton: {
+    backgroundColor: '#2563eb',
+    color: '#ffffff',
+    border: 'none',
+    padding: '10px 24px',
+    borderRadius: '6px',
+    fontWeight: '600',
+    fontSize: '14px',
+    cursor: 'pointer'
   }
 };
 

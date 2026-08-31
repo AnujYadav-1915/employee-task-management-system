@@ -5,16 +5,25 @@ spring:
   application:
     name: taskflow-backend
   datasource:
-    url: jdbc:h2:mem:taskflow_db;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
-    username: sa
-    password: 
-    driver-class-name: org.h2.Driver
+    admin:
+      url: jdbc:h2:mem:admin_db;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+      username: sa
+      password: 
+      driver-class-name: org.h2.Driver
+    manager:
+      url: jdbc:h2:mem:manager_db;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+      username: sa
+      password: 
+      driver-class-name: org.h2.Driver
+    employee:
+      url: jdbc:h2:mem:employee_db;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+      username: sa
+      password: 
+      driver-class-name: org.h2.Driver
   h2:
     console:
       enabled: true
   jpa:
-    hibernate:
-      ddl-auto: update
     show-sql: false
 
 jwt:
