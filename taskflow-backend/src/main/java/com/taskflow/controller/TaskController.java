@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,6 +46,11 @@ public class TaskController {
         if (task.getStatus() == null) {
             task.setStatus(TaskStatus.PENDING);
         }
+        if (task.getCreatedAt() == null) {
+            task.setCreatedAt(LocalDateTime.now());
+        }
+        task.setUpdatedAt(LocalDateTime.now());
+
         Task savedTask = taskRepository.save(task);
 
         String msg = String.format("Task '%s' was created and assigned to %s", savedTask.getTitle(), savedTask.getAssignedEmployeeName() != null ? savedTask.getAssignedEmployeeName() : "employee");
@@ -64,6 +70,8 @@ public class TaskController {
                     task.setAssignedEmployeeId(details.getAssignedEmployeeId());
                     task.setAssignedEmployeeName(details.getAssignedEmployeeName());
                     task.setDueDate(details.getDueDate());
+                    task.setUpdatedAt(LocalDateTime.now());
+
                     Task updated = taskRepository.save(task);
 
                     String msg = String.format("Task '%s' details updated", updated.getTitle());
@@ -86,6 +94,7 @@ public class TaskController {
             return taskRepository.findById(id)
                     .map(task -> {
                         task.setStatus(newStatus);
+                        task.setUpdatedAt(LocalDateTime.now());
                         Task updated = taskRepository.save(task);
 
                         String msg = String.format("Task '%s' status changed to %s", updated.getTitle(), newStatus);
