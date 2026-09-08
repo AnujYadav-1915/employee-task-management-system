@@ -22,4 +22,14 @@ api.interceptors.request.use(
   }
 );
 
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (!error.response) {
+      console.error('Network Connection Error: Server unreachable');
+    }
+    return Promise.reject(error);
+  }
+);
+
 export default api;

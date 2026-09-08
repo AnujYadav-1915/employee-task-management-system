@@ -8,6 +8,8 @@ const TaskModal = ({ isOpen, onClose, onSubmit, initialTask }) => {
   const [status, setStatus] = useState('PENDING');
   const [assignedEmployeeId, setAssignedEmployeeId] = useState('');
   const [dueDate, setDueDate] = useState('');
+  const [allocatedHours, setAllocatedHours] = useState(8);
+  const [progressPercentage, setProgressPercentage] = useState(0);
   const [employees, setEmployees] = useState([]);
 
   useEffect(() => {
@@ -22,6 +24,8 @@ const TaskModal = ({ isOpen, onClose, onSubmit, initialTask }) => {
       setStatus(initialTask.status || 'PENDING');
       setAssignedEmployeeId(initialTask.assignedEmployeeId || '');
       setDueDate(initialTask.dueDate || '');
+      setAllocatedHours(initialTask.allocatedHours != null ? initialTask.allocatedHours : 8);
+      setProgressPercentage(initialTask.progressPercentage != null ? initialTask.progressPercentage : 0);
     } else {
       setTitle('');
       setDescription('');
@@ -29,6 +33,8 @@ const TaskModal = ({ isOpen, onClose, onSubmit, initialTask }) => {
       setStatus('PENDING');
       setAssignedEmployeeId('');
       setDueDate('');
+      setAllocatedHours(8);
+      setProgressPercentage(0);
     }
   }, [initialTask, isOpen]);
 
@@ -54,7 +60,9 @@ const TaskModal = ({ isOpen, onClose, onSubmit, initialTask }) => {
       status,
       assignedEmployeeId: assignedEmployeeId ? Number(assignedEmployeeId) : null,
       assignedEmployeeName: selectedEmp ? selectedEmp.name : 'Unassigned',
-      dueDate
+      dueDate,
+      allocatedHours: Number(allocatedHours) || 0,
+      progressPercentage: Number(progressPercentage) || 0
     });
   };
 
@@ -107,6 +115,39 @@ const TaskModal = ({ isOpen, onClose, onSubmit, initialTask }) => {
                 <option value="COMPLETED">Completed</option>
                 <option value="ON_HOLD">On Hold</option>
               </select>
+            </div>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+            <div className="form-group">
+              <label>Allocated Time (Hours)</label>
+              <input 
+                type="number" 
+                min="0"
+                step="0.5"
+                className="form-control" 
+                value={allocatedHours} 
+                onChange={(e) => setAllocatedHours(e.target.value)} 
+                required
+                placeholder="e.g. 8"
+              />
+            </div>
+
+            <div className="form-group">
+              <label>Completion Progress ({progressPercentage}%)</label>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <input 
+                  type="range" 
+                  min="0" 
+                  max="100" 
+                  step="5"
+                  className="form-control" 
+                  value={progressPercentage} 
+                  onChange={(e) => setProgressPercentage(e.target.value)} 
+                  style={{ flex: 1 }}
+                />
+                <span style={{ fontSize: '13px', fontWeight: 'bold', color: '#2563eb', width: '40px' }}>{progressPercentage}%</span>
+              </div>
             </div>
           </div>
 

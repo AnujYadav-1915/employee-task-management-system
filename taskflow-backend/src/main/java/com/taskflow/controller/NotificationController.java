@@ -1,8 +1,7 @@
 package com.taskflow.controller;
 
 import com.taskflow.model.Notification;
-import com.taskflow.repository.NotificationRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.taskflow.service.NotificationService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,26 +11,25 @@ import java.util.List;
 @RequestMapping("/api/notifications")
 public class NotificationController {
 
-    @Autowired
-    private NotificationRepository notificationRepository;
+    private final NotificationService notificationService;
+
+    public NotificationController(NotificationService notificationService) {
+        this.notificationService = notificationService;
+    }
 
     @GetMapping
     public List<Notification> getAllNotifications() {
-        return notificationRepository.findAllByOrderByCreatedAtDesc();
+        return notificationService.getAllNotifications();
     }
 
     @GetMapping("/user/{userId}")
     public List<Notification> getNotificationsForUser(@PathVariable Long userId) {
-        return notificationRepository.findByUserIdOrderByCreatedAtDesc(userId);
+        return notificationService.getNotificationsForUser(userId);
     }
 
     @PatchMapping("/{id}/read")
     public ResponseEntity<Notification> markAsRead(@PathVariable Long id) {
-        return notificationRepository.findById(id)
-                .map(notification -> {
-                    notification.setReadStatus(true);
-                    return ResponseEntity.ok(notificationRepository.save(notification));
-                })
-                .orElse(ResponseEntity.notFound().build());
+        Notification updated = notificationService.markAsRead(id);
+        return updated != null ? ResponseEntity.ok(updated) : ResponseEntity.notFound().build();
     }
 }

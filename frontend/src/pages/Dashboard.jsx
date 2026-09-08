@@ -97,18 +97,33 @@ const Dashboard = () => {
                       <tr>
                         <th>Title</th>
                         <th>Assignee</th>
+                        <th>Progress (%)</th>
                         <th>Priority</th>
                         <th>Status</th>
                       </tr>
                     </thead>
                     <tbody>
                       {recentTasks.length === 0 ? (
-                        <tr><td colSpan="4" style={{ textAlign: 'center', color: '#94a3b8' }}>No tasks found</td></tr>
+                        <tr><td colSpan="5" style={{ textAlign: 'center', color: '#94a3b8' }}>No tasks found</td></tr>
                       ) : (
                         recentTasks.map(task => (
                           <tr key={task.id}>
                             <td style={{ fontWeight: '500' }}>{task.title}</td>
                             <td>{task.assignedEmployeeName || 'Unassigned'}</td>
+                            <td>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                <div style={{ width: '60px', height: '6px', backgroundColor: '#e2e8f0', borderRadius: '3px', overflow: 'hidden' }}>
+                                  <div style={{ 
+                                    width: `${task.progressPercentage || 0}%`, 
+                                    height: '100%', 
+                                    backgroundColor: (task.progressPercentage || 0) === 100 ? '#16a34a' : '#2563eb' 
+                                  }} />
+                                </div>
+                                <span style={{ fontSize: '11px', fontWeight: '600', color: '#2563eb' }}>
+                                  {task.progressPercentage || 0}%
+                                </span>
+                              </div>
+                            </td>
                             <td>
                               <span className={`badge badge-${task.priority?.toLowerCase()}`}>
                                 {task.priority}

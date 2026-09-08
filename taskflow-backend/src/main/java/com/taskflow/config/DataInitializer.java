@@ -8,7 +8,6 @@ import com.taskflow.repository.*;
 import com.taskflow.repository.admin.AdminUserRepository;
 import com.taskflow.repository.employee.EmployeeUserRepository;
 import com.taskflow.repository.manager.ManagerUserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -19,32 +18,35 @@ import java.util.List;
 @Component
 public class DataInitializer implements CommandLineRunner {
 
-    @Autowired
-    private AdminUserRepository adminUserRepository;
+    private final AdminUserRepository adminUserRepository;
+    private final ManagerUserRepository managerUserRepository;
+    private final EmployeeUserRepository employeeUserRepository;
+    private final EmployeeRepository employeeRepository;
+    private final TaskRepository taskRepository;
+    private final CommentRepository commentRepository;
+    private final NotificationRepository notificationRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private ManagerUserRepository managerUserRepository;
-
-    @Autowired
-    private EmployeeUserRepository employeeUserRepository;
-
-    @Autowired
-    private EmployeeRepository employeeRepository;
-
-    @Autowired
-    private TaskRepository taskRepository;
-
-    @Autowired
-    private CommentRepository commentRepository;
-
-    @Autowired
-    private NotificationRepository notificationRepository;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    public DataInitializer(AdminUserRepository adminUserRepository,
+                           ManagerUserRepository managerUserRepository,
+                           EmployeeUserRepository employeeUserRepository,
+                           EmployeeRepository employeeRepository,
+                           TaskRepository taskRepository,
+                           CommentRepository commentRepository,
+                           NotificationRepository notificationRepository,
+                           PasswordEncoder passwordEncoder) {
+        this.adminUserRepository = adminUserRepository;
+        this.managerUserRepository = managerUserRepository;
+        this.employeeUserRepository = employeeUserRepository;
+        this.employeeRepository = employeeRepository;
+        this.taskRepository = taskRepository;
+        this.commentRepository = commentRepository;
+        this.notificationRepository = notificationRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     @Override
-    public void run(String... args) throws Exception {
+    public void run(String... args) {
         if (adminUserRepository.count() == 0) {
             seedAdminData();
         }
@@ -60,25 +62,23 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     private void seedAdminData() {
-        // Exclusive Administrator Account for Anuj in admin_db
-        AdminUser adminAnuj = new AdminUser(
+        AdminUser admin = new AdminUser(
                 "Anuj",
                 "anujyadav11112003@gmail.com",
                 passwordEncoder.encode("Anuj"),
                 Role.ROLE_ADMIN
         );
-        adminUserRepository.save(adminAnuj);
+        adminUserRepository.save(admin);
     }
 
     private void seedManagerData() {
-        // Manager accounts seeded in manager_db
-        ManagerUser manager1 = new ManagerUser(
+        ManagerUser manager = new ManagerUser(
                 "ManagerOne",
                 "manager1@taskflow.com",
                 passwordEncoder.encode("manager123"),
                 Role.ROLE_MANAGER
         );
-        managerUserRepository.save(manager1);
+        managerUserRepository.save(manager);
     }
 
     private void seedEmployeeData() {
@@ -114,23 +114,21 @@ public class DataInitializer implements CommandLineRunner {
         List<Employee> empList = employeeRepository.findAll();
 
         List<Task> tasks = Arrays.asList(
-                new Task("Website Redesign UI", "Implement new responsive Kanban layout and theme styles", TaskStatus.IN_PROGRESS, Priority.HIGH, empList.get(2).getId(), empList.get(2).getName(), "2026-09-15"),
-                new Task("Database Optimization", "Optimize JPA query indexing and caching strategies", TaskStatus.COMPLETED, Priority.HIGH, empList.get(1).getId(), empList.get(1).getName(), "2026-09-01"),
-                new Task("JWT Auth Pipeline", "Verify token verification and role-based access filters", TaskStatus.COMPLETED, Priority.HIGH, empList.get(7).getId(), empList.get(7).getName(), "2026-08-30"),
-                new Task("Docker Deployment Setup", "Configure Docker Compose orchestration and build rules", TaskStatus.COMPLETED, Priority.MEDIUM, empList.get(3).getId(), empList.get(3).getName(), "2026-09-05"),
-                new Task("API Documentation Review", "Update OpenAPI Swagger documentation for endpoints", TaskStatus.IN_PROGRESS, Priority.LOW, empList.get(5).getId(), empList.get(5).getName(), "2026-09-20"),
-                new Task("Automated E2E Testing", "Write unit and component test suites for API gateway", TaskStatus.PENDING, Priority.MEDIUM, empList.get(4).getId(), empList.get(4).getName(), "2026-09-25"),
-                new Task("Analytics Report Pipeline", "Aggregate weekly task completion metrics for dashboard", TaskStatus.PENDING, Priority.MEDIUM, empList.get(6).getId(), empList.get(6).getName(), "2026-09-18"),
-                new Task("System Architecture Review", "Conduct security audit and service decoupling check", TaskStatus.ON_HOLD, Priority.HIGH, empList.get(8).getId(), empList.get(8).getName(), "2026-10-01"),
-                new Task("Sprint Planning Workshop", "Coordinate sprint backlog items and task sizing", TaskStatus.COMPLETED, Priority.LOW, empList.get(9).getId(), empList.get(9).getName(), "2026-08-28"),
-                new Task("Mobile View Alignment", "Ensure responsive grid breakpoints on mobile viewports", TaskStatus.IN_PROGRESS, Priority.HIGH, empList.get(0).getId(), empList.get(0).getName(), "2026-09-10")
+                new Task("Website Redesign UI", "Implement new responsive Kanban layout and theme styles", TaskStatus.IN_PROGRESS, Priority.HIGH, empList.get(2).getId(), empList.get(2).getName(), "2026-09-15", 8.0, 40),
+                new Task("Database Optimization", "Optimize JPA query indexing and caching strategies", TaskStatus.COMPLETED, Priority.HIGH, empList.get(1).getId(), empList.get(1).getName(), "2026-09-01", 8.0, 100),
+                new Task("JWT Auth Pipeline", "Verify token verification and role-based access filters", TaskStatus.COMPLETED, Priority.HIGH, empList.get(7).getId(), empList.get(7).getName(), "2026-08-30", 6.0, 100),
+                new Task("Docker Deployment Setup", "Configure Docker Compose orchestration and build rules", TaskStatus.COMPLETED, Priority.MEDIUM, empList.get(3).getId(), empList.get(3).getName(), "2026-09-05", 4.0, 100),
+                new Task("API Documentation Review", "Update OpenAPI Swagger documentation for endpoints", TaskStatus.IN_PROGRESS, Priority.LOW, empList.get(5).getId(), empList.get(5).getName(), "2026-09-20", 8.0, 20),
+                new Task("Automated E2E Testing", "Write unit and component test suites for API gateway", TaskStatus.PENDING, Priority.MEDIUM, empList.get(4).getId(), empList.get(4).getName(), "2026-09-25", 8.0, 0),
+                new Task("Analytics Report Pipeline", "Aggregate weekly task completion metrics for dashboard", TaskStatus.PENDING, Priority.MEDIUM, empList.get(6).getId(), empList.get(6).getName(), "2026-09-18", 8.0, 0),
+                new Task("System Architecture Review", "Conduct security audit and service decoupling check", TaskStatus.ON_HOLD, Priority.HIGH, empList.get(8).getId(), empList.get(8).getName(), "2026-10-01", 10.0, 10),
+                new Task("Sprint Planning Workshop", "Coordinate sprint backlog items and task sizing", TaskStatus.COMPLETED, Priority.LOW, empList.get(9).getId(), empList.get(9).getName(), "2026-08-28", 5.0, 100),
+                new Task("Mobile View Alignment", "Ensure responsive grid breakpoints on mobile viewports", TaskStatus.IN_PROGRESS, Priority.HIGH, empList.get(0).getId(), empList.get(0).getName(), "2026-09-10", 8.0, 60)
         );
 
         List<Task> savedTasks = taskRepository.saveAll(tasks);
 
-        // Seed 10 Comments
-        for (int i = 0; i < savedTasks.size(); i++) {
-            Task t = savedTasks.get(i);
+        for (Task t : savedTasks) {
             commentRepository.save(new Comment(t.getId(), "Anuj", "Reviewed task progress for " + t.getTitle() + ". Execution on track."));
             notificationRepository.save(new Notification(t.getAssignedEmployeeId(), "Task '" + t.getTitle() + "' status is " + t.getStatus(), "TASK_UPDATE"));
         }

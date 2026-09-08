@@ -26,6 +26,14 @@ export const taskService = {
     return response.data;
   },
 
+  updateProgress: async (id, progressPercentage, note, authorName) => {
+    const payload = { progressPercentage };
+    if (note) payload.note = note;
+    if (authorName) payload.authorName = authorName;
+    const response = await api.patch(`/tasks/${id}/progress`, payload);
+    return response.data;
+  },
+
   delete: async (id) => {
     const response = await api.delete(`/tasks/${id}`);
     return response.data;

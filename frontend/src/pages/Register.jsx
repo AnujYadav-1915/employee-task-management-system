@@ -1,5 +1,6 @@
 import React, { useState, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
+import { UIContext } from '../context/UIContext';
 import { useNavigate, Link } from 'react-router-dom';
 
 const Register = () => {
@@ -10,6 +11,7 @@ const Register = () => {
   const [error, setError] = useState('');
   const [showAdminModal, setShowAdminModal] = useState(false);
   const { register } = useContext(AuthContext);
+  const { showLoading, hideLoading, showSuccess, showError } = useContext(UIContext);
   const navigate = useNavigate();
 
   const handleRoleChange = (e) => {
@@ -32,16 +34,21 @@ const Register = () => {
       return;
     }
 
+    showLoading('Creating new account...');
     try {
       await register(username, email, password, role);
-      navigate('/dashboard');
+      hideLoading();
+      showSuccess('Registration completed successfully! Please sign in.', 'Account Created');
+      navigate('/login', { state: { message: 'Registration successful! Please sign in with your credentials.' } });
     } catch (err) {
+      hideLoading();
       const msg = err.response?.data?.message || 'Registration failed.';
       if (msg.toLowerCase().includes('administrator')) {
         setShowAdminModal(true);
         setRole('ROLE_EMPLOYEE');
       } else {
         setError(msg);
+        showError(msg, 'Registration Failed');
       }
     }
   };
@@ -113,7 +120,7 @@ const Register = () => {
         </p>
       </div>
 
-      {/* Administrator Block Notification Modal */}
+      
       {showAdminModal && (
         <div style={styles.modalOverlay}>
           <div style={styles.modalContent}>

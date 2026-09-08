@@ -16,7 +16,7 @@ public class Notification {
     @Column(nullable = false)
     private String message;
 
-    private String type; // TASK_CREATED, TASK_ASSIGNED, TASK_STATUS_CHANGED, TASK_COMPLETED
+    private String type;
 
     private boolean readStatus;
 

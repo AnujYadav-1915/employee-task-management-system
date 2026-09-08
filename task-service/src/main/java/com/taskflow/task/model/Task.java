@@ -29,6 +29,10 @@ public class Task {
     private String assignedEmployeeName;
 
     private String dueDate;
+
+    private Double allocatedHours = 0.0;
+    private Integer progressPercentage = 0;
+
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -37,7 +41,7 @@ public class Task {
         this.updatedAt = LocalDateTime.now();
     }
 
-    public Task(String title, String description, TaskStatus status, Priority priority, Long assignedEmployeeId, String assignedEmployeeName, String dueDate) {
+    public Task(String title, String description, TaskStatus status, Priority priority, Long assignedEmployeeId, String assignedEmployeeName, String dueDate, Double allocatedHours, Integer progressPercentage) {
         this.title = title;
         this.description = description;
         this.status = status;
@@ -45,6 +49,8 @@ public class Task {
         this.assignedEmployeeId = assignedEmployeeId;
         this.assignedEmployeeName = assignedEmployeeName;
         this.dueDate = dueDate;
+        this.allocatedHours = allocatedHours != null ? allocatedHours : 0.0;
+        this.progressPercentage = progressPercentage != null ? progressPercentage : 0;
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
     }
@@ -116,6 +122,22 @@ public class Task {
 
     public void setDueDate(String dueDate) {
         this.dueDate = dueDate;
+    }
+
+    public Double getAllocatedHours() {
+        return allocatedHours;
+    }
+
+    public void setAllocatedHours(Double allocatedHours) {
+        this.allocatedHours = allocatedHours;
+    }
+
+    public Integer getProgressPercentage() {
+        return progressPercentage;
+    }
+
+    public void setProgressPercentage(Integer progressPercentage) {
+        this.progressPercentage = progressPercentage;
     }
 
     public LocalDateTime getCreatedAt() {

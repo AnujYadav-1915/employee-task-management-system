@@ -12,35 +12,6 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
 
-  redis:
-    image: redis:alpine
-    container_name: taskflow-redis
-    ports:
-      - "6379:6379"
-
-  zookeeper:
-    image: confluentinc/cp-zookeeper:7.3.0
-    container_name: taskflow-zookeeper
-    environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-      ZOOKEEPER_TICK_TIME: 2000
-
-  kafka:
-    image: confluentinc/cp-kafka:7.3.0
-    container_name: taskflow-kafka
-    ports:
-      - "9092:9092"
-    depends_on:
-      - zookeeper
-    environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,PLAINTEXT_INTERNAL://kafka:29092
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
-      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
-
   api-gateway:
     build: ./api-gateway
     container_name: taskflow-gateway
@@ -90,13 +61,10 @@ services:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/taskflow_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: root
-      SPRING_REDIS_HOST: redis
-      SPRING_REDIS_PORT: 6379
-      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      NOTIFICATION_SERVICE_URL: http://notification-service:8084
     depends_on:
       - mysql
-      - redis
-      - kafka
+      - notification-service
 
   notification-service:
     build: ./notification-service
@@ -107,10 +75,8 @@ services:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/taskflow_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: root
-      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
     depends_on:
       - mysql
-      - kafka
 
   frontend:
     build: ./frontend

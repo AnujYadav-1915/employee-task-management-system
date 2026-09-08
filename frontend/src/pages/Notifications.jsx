@@ -1,34 +1,42 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import Navbar from '../components/Navbar';
 import Sidebar from '../components/Sidebar';
 import { taskService } from '../services/taskService';
+import { UIContext } from '../context/UIContext';
 
 const Notifications = () => {
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const { showLoading, hideLoading, showSuccess, showError } = useContext(UIContext);
+
   useEffect(() => {
     fetchNotifications();
   }, []);
 
-  const fetchNotifications = async () => {
+  const fetchNotifications = async (silent = false) => {
     try {
-      setLoading(true);
+      if (!silent) setLoading(true);
       const data = await taskService.getNotifications();
       setNotifications(data);
     } catch (err) {
       console.error(err);
+      showError('Failed to fetch notifications.', 'Error');
     } finally {
-      setLoading(false);
+      if (!silent) setLoading(false);
     }
   };
 
   const handleMarkAsRead = async (id) => {
+    showLoading('Updating notification...');
     try {
       await taskService.markNotificationRead(id);
-      fetchNotifications();
+      hideLoading();
+      showSuccess('Notification marked as read.', 'Updated');
+      fetchNotifications(true);
     } catch (err) {
-      console.error(err);
+      hideLoading();
+      showError('Failed to update notification.', 'Action Failed');
     }
   };
 

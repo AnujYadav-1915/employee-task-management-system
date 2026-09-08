@@ -1,13 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import Navbar from '../components/Navbar';
 import Sidebar from '../components/Sidebar';
 import { employeeService } from '../services/employeeService';
+import { UIContext } from '../context/UIContext';
 
 const Employees = () => {
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editingEmp, setEditingEmp] = useState(null);
+
+  const { showLoading, hideLoading, showSuccess, showError } = useContext(UIContext);
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -20,15 +23,16 @@ const Employees = () => {
     fetchEmployees();
   }, []);
 
-  const fetchEmployees = async () => {
+  const fetchEmployees = async (silent = false) => {
     try {
-      setLoading(true);
+      if (!silent) setLoading(true);
       const data = await employeeService.getAll();
       setEmployees(data);
     } catch (err) {
       console.error('Error fetching employees:', err);
+      showError('Failed to fetch employee list.', 'Error');
     } finally {
-      setLoading(false);
+      if (!silent) setLoading(false);
     }
   };
 
@@ -55,6 +59,8 @@ const Employees = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const isEdit = !!editingEmp;
+    showLoading(isEdit ? 'Updating employee record...' : 'Adding new employee...');
     const payload = { name, email, role, department, status, phone };
     try {
       if (editingEmp) {
@@ -62,20 +68,28 @@ const Employees = () => {
       } else {
         await employeeService.create(payload);
       }
+      hideLoading();
+      showSuccess(isEdit ? 'Employee updated successfully!' : 'New employee added successfully!', isEdit ? 'Record Saved' : 'Employee Added');
       setShowModal(false);
-      fetchEmployees();
+      fetchEmployees(true);
     } catch (err) {
-      console.error('Error saving employee:', err);
+      hideLoading();
+      const msg = err.response?.data?.message || 'Failed to save employee. Invalid action.';
+      showError(msg, 'Action Failed');
     }
   };
 
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to remove this employee?')) {
+      showLoading('Removing employee record...');
       try {
         await employeeService.delete(id);
-        fetchEmployees();
+        hideLoading();
+        showSuccess('Employee removed successfully!', 'Employee Deleted');
+        fetchEmployees(true);
       } catch (err) {
-        console.error('Error deleting employee:', err);
+        hideLoading();
+        showError('Failed to remove employee.', 'Action Failed');
       }
     }
   };

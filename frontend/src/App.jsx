@@ -1,6 +1,9 @@
 import React, { useContext } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, AuthContext } from './context/AuthContext';
+import { UIProvider } from './context/UIContext';
+import LoadingSpinner from './components/LoadingSpinner';
+import ToastNotification from './components/ToastNotification';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
@@ -10,46 +13,50 @@ import Notifications from './pages/Notifications';
 
 const PrivateRoute = ({ children }) => {
   const { user, loading } = useContext(AuthContext);
-  if (loading) return <div>Loading...</div>;
+  if (loading) return null;
   return user ? children : <Navigate to="/login" />;
 };
 
 function App() {
   return (
-    <AuthProvider>
-      <Router>
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          
-          <Route path="/dashboard" element={
-            <PrivateRoute>
-              <Dashboard />
-            </PrivateRoute>
-          } />
-          
-          <Route path="/tasks" element={
-            <PrivateRoute>
-              <Tasks />
-            </PrivateRoute>
-          } />
-          
-          <Route path="/employees" element={
-            <PrivateRoute>
-              <Employees />
-            </PrivateRoute>
-          } />
+    <UIProvider>
+      <AuthProvider>
+        <LoadingSpinner />
+        <ToastNotification />
+        <Router>
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            
+            <Route path="/dashboard" element={
+              <PrivateRoute>
+                <Dashboard />
+              </PrivateRoute>
+            } />
+            
+            <Route path="/tasks" element={
+              <PrivateRoute>
+                <Tasks />
+              </PrivateRoute>
+            } />
+            
+            <Route path="/employees" element={
+              <PrivateRoute>
+                <Employees />
+              </PrivateRoute>
+            } />
 
-          <Route path="/notifications" element={
-            <PrivateRoute>
-              <Notifications />
-            </PrivateRoute>
-          } />
+            <Route path="/notifications" element={
+              <PrivateRoute>
+                <Notifications />
+              </PrivateRoute>
+            } />
 
-          <Route path="*" element={<Navigate to="/dashboard" />} />
-        </Routes>
-      </Router>
-    </AuthProvider>
+            <Route path="*" element={<Navigate to="/dashboard" />} />
+          </Routes>
+        </Router>
+      </AuthProvider>
+    </UIProvider>
   );
 }
 

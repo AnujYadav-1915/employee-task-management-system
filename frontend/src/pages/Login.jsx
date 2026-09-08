@@ -1,22 +1,33 @@
 import React, { useState, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
-import { useNavigate, Link } from 'react-router-dom';
+import { UIContext } from '../context/UIContext';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 
 const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const location = useLocation();
+  const [successMsg, setSuccessMsg] = useState(location.state?.message || '');
   const { login } = useContext(AuthContext);
+  const { showLoading, hideLoading, showSuccess, showError } = useContext(UIContext);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setSuccessMsg('');
+    showLoading('Authenticating credentials...');
     try {
       await login(username, password);
+      hideLoading();
+      showSuccess('Logged in successfully! Redirecting to dashboard...', 'Welcome');
       navigate('/dashboard');
     } catch (err) {
-      setError(err.response?.data?.message || 'Login failed. Please check credentials.');
+      hideLoading();
+      const errMsg = err.response?.data?.message || 'Login failed. Please check your credentials.';
+      setError(errMsg);
+      showError(errMsg, 'Authentication Failed');
     }
   };
 
@@ -29,6 +40,7 @@ const Login = () => {
           <p style={styles.subtitle}>Enter your credentials to access your account</p>
         </div>
 
+        {successMsg && <div style={styles.successAlert}>{successMsg}</div>}
         {error && <div style={styles.alert}>{error}</div>}
 
         <form onSubmit={handleSubmit}>
@@ -115,6 +127,15 @@ const styles = {
   alert: {
     backgroundColor: '#fee2e2',
     color: '#991b1b',
+    padding: '10px 12px',
+    borderRadius: '6px',
+    fontSize: '13px',
+    marginBottom: '16px'
+  },
+  successAlert: {
+    backgroundColor: '#dcfce7',
+    color: '#166534',
+    border: '1px solid #bbf7d0',
     padding: '10px 12px',
     borderRadius: '6px',
     fontSize: '13px',
