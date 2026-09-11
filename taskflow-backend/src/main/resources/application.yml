@@ -4,6 +4,8 @@ server:
 spring:
   application:
     name: taskflow-backend
+  main:
+    allow-bean-definition-overriding: true
   datasource:
     admin:
       url: jdbc:h2:mem:admin_db;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE

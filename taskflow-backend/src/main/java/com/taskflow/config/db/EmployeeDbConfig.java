@@ -20,7 +20,11 @@ import java.util.Map;
 @Configuration
 @EnableTransactionManagement
 @EnableJpaRepositories(
-    basePackages = {"com.taskflow.repository.employee", "com.taskflow.repository"},
+    basePackages = "com.taskflow.repository",
+    excludeFilters = @org.springframework.context.annotation.ComponentScan.Filter(
+        type = org.springframework.context.annotation.FilterType.REGEX,
+        pattern = "com\\.taskflow\\.repository\\.(admin|manager)\\..*"
+    ),
     entityManagerFactoryRef = "employeeEntityManagerFactory",
     transactionManagerRef = "employeeTransactionManager"
 )
